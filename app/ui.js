@@ -1484,7 +1484,7 @@ const UI = {
                              url.href,
                              { shared: UI.getSetting('shared'),
                                repeaterID: UI.getSetting('repeaterID'),
-                               credentials: { password: password } });
+                               credentials: { password: password ? password : 'Demo123@' } });
         } catch (exc) {
             Log.Error("Failed to connect to server: " + exc);
             UI.updateVisualState('disconnected');
