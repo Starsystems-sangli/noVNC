@@ -582,16 +582,6 @@
           </div>
     </div>
 
-    <!-- Connect button -->
-    <div class="noVNC_center">
-        <div id="noVNC_connect_dlg">
-            <!--div id="noVNC_connect_button">
-                <div>
-                    <img alt="" src="app/images/connect.svg"> Connect
-                </div>
-            </div-->
-        </div>
-    </div>
 
     <!-- Transition Screens -->
     <div id="noVNC_transition">
@@ -600,6 +590,62 @@
         <input type="button" id="noVNC_cancel_reconnect_button" value="Cancel" class="noVNC_submit">
         </div>
         <div class="noVNC_spinner"></div>
+    </div>
+
+    <!-- Connect button -->
+    <div class="noVNC_center">
+        <div id="noVNC_connect_dlg">
+            <p class="noVNC_logo" translate="no"><span>no</span>VNC</p>
+            <div>
+                <button id="noVNC_connect_button">
+                    <img alt="" src="app/images/connect.svg"> Connect
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server key verification dialog -->
+    <div class="noVNC_center noVNC_connect_layer">
+    <div id="noVNC_verify_server_dlg" class="noVNC_panel"><form>
+        <div class="noVNC_heading">
+            Server identity
+        </div>
+        <div>
+            The server has provided the following identifying information:
+        </div>
+        <div id="noVNC_fingerprint_block">
+            Fingerprint:
+            <span id="noVNC_fingerprint"></span>
+        </div>
+        <div>
+            Please verify that the information is correct and press
+            "Approve". Otherwise press "Reject".
+        </div>
+        <div class="button_row">
+            <input id="noVNC_approve_server_button" type="submit" value="Approve">
+            <input id="noVNC_reject_server_button" type="button" value="Reject">
+        </div>
+    </form></div>
+    </div>
+
+    <!-- Password dialog -->
+    <div class="noVNC_center noVNC_connect_layer">
+    <div id="noVNC_credentials_dlg" class="noVNC_panel"><form>
+        <div class="noVNC_heading">
+            Credentials
+        </div>
+        <div id="noVNC_username_block">
+            <label for="noVNC_username_input">Username:</label>
+            <input id="noVNC_username_input">
+        </div>
+        <div id="noVNC_password_block">
+            <label for="noVNC_password_input">Password:</label>
+            <input id="noVNC_password_input" type="password">
+        </div>
+        <div class="button_row">
+            <input id="noVNC_credentials_button" type="submit" value="Send credentials">
+        </div>
+    </form></div>
     </div>
 
     <!-- This is where the RFB elements will attach -->
