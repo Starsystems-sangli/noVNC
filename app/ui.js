@@ -1431,7 +1431,7 @@ const UI = {
         }
 
         if (password === null) {
-            password = prompt("Please enter your password:", "");
+            password = undefined;
         }
 
         UI.hideStatus();
@@ -1462,7 +1462,7 @@ const UI = {
                         { 
                             shared: UI.getSetting('shared'),
                             repeaterID: UI.getSetting('repeaterID'),
-                            credentials: { password: password } 
+                            credentials: { password: prompt("Please enter your password:", "") } 
                         },
                         true );
         UI.rfb.addEventListener("connect", UI.connectFinished);
