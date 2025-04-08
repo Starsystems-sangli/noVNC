@@ -64,6 +64,16 @@ const extendedClipboardFormatDib    = 1 << 3;
 const extendedClipboardFormatFiles  = 1 << 4;
 /*eslint-enable */
 
+// Security types
+const securityTypeNone              = 1;
+const securityTypeVNCAuth           = 2;
+const securityTypeRA2ne             = 6;
+const securityTypeTight             = 16;
+const securityTypeVeNCrypt          = 19;
+const securityTypeXVP               = 22;
+const securityTypeARD               = 30;
+const securityTypeMSLogonII         = 113;
+
 // Extended clipboard pseudo-encoding actions
 const extendedClipboardActionCaps    = 1 << 24;
 const extendedClipboardActionRequest = 1 << 25;
@@ -766,7 +776,7 @@ export default class RFB extends EventTargetMixin {
         // it originally did via the WebSocket's event handler
         setTimeout(this._initMsg.bind(this), 0);
     }
-    
+
     refreshSecondaryDisplays() {
         //send secondary displays new settings
         if (this._display.screens.length > 1) {
@@ -2965,30 +2975,43 @@ export default class RFB extends EventTargetMixin {
         return this._fail("No supported sub-auth types!");
     }
 
+    
     _negotiateAuthentication() {
         switch (this._rfbAuthScheme) {
-            case 1:  // no auth
+            case securityTypeNone:
                 if (this._rfbVersion >= 3.8) {
                     this._rfbInitState = 'SecurityResult';
-                    return true;
+                } else {
+                    this._rfbInitState = 'ClientInitialisation';
                 }
-                this._rfbInitState = 'ClientInitialisation';
-                return this._initMsg();
+                return true;
 
-            case 22:  // XVP auth
+            case securityTypeXVP:
                 return this._negotiateXvpAuth();
 
-            case 2:  // VNC authentication
+            case securityTypeARD:
+                return this._negotiateARDAuth();
+
+            case securityTypeVNCAuth:
                 return this._negotiateStdVNCAuth();
 
-            case 16:  // TightVNC Security Type
+            case securityTypeTight:
                 return this._negotiateTightAuth();
 
-            case 19:  // VeNCrypt Security Type
+            case securityTypeVeNCrypt:
                 return this._negotiateVeNCryptAuth();
 
-            case 129:  // TightVNC UNIX Security Type
+            case securityTypePlain:
+                return this._negotiatePlainAuth();
+
+            case securityTypeUnixLogon:
                 return this._negotiateTightUnixAuth();
+
+            case securityTypeRA2ne:
+                return this._negotiateRA2neAuth();
+
+            case securityTypeMSLogonII:
+                return this._negotiateMSLogonIIAuth();
 
             default:
                 return this._fail("Unsupported auth scheme (scheme: " +
