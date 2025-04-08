@@ -740,7 +740,26 @@ export default class RFB extends EventTargetMixin {
     }
 
     // ===== PUBLIC METHODS =====
+    disconnect() {
+        this._updateConnectionState('disconnecting');
+        this._sock.off('error');
+        this._sock.off('message');
+        this._sock.off('open');
+        if (this._rfbRSAAESAuthenticationState !== null) {
+            this._rfbRSAAESAuthenticationState.disconnect();
+        }
+    }
 
+    approveServer() {
+        if (this._rfbRSAAESAuthenticationState !== null) {
+            this._rfbRSAAESAuthenticationState.approveServer();
+        }
+    }
+
+    sendCredentials(creds) {
+        this._rfbCredentials = creds;
+        this._resumeAuthentication();
+    }
     refreshSecondaryDisplays() {
         //send secondary displays new settings
         if (this._display.screens.length > 1) {
