@@ -1459,8 +1459,7 @@ const UI = {
             url,
             {
                 shared: UI.getSetting('shared'),
-                repeaterID: UI.getSetting('repeaterID'),
-                credentials: { password: "Demo123@" }
+                repeaterID: UI.getSetting('repeaterID')
             },
             true);
         UI.rfb.addEventListener("connect", UI.connectFinished);
