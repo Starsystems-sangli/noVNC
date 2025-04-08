@@ -1551,63 +1551,6 @@ const UI = {
         UI.rfb.enableWebP = UI.getSetting('enable_webp');
         UI.updateViewOnly(); // requires UI.rfb
 
-        /****
-        *    Kasm VDI specific
-        *****/
-        if (WebUtil.isInsideKasmVDI()) {
-            if (window.addEventListener) { // Mozilla, Netscape, Firefox
-                //window.addEventListener('load', WindowLoad, false);
-                window.addEventListener('message', UI.receiveMessage, false);
-            } else if (window.attachEvent) { //IE
-                window.attachEvent('onload', WindowLoad);
-                window.attachEvent('message', UI.receiveMessage);
-            }
-            if (UI.rfb.clipboardDown) {
-                UI.rfb.addEventListener("clipboard", UI.clipboardRx);
-            }
-            UI.rfb.addEventListener("disconnect", UI.disconnectedRx);
-            if (!WebUtil.getConfigVar('show_control_bar')) {
-                document.getElementById('noVNC_control_bar_anchor').setAttribute('style', 'display: none');
-            }
-
-            //keep alive for websocket connection to stay open, since we may not control reverse proxies
-            //send a keep alive within a window that we control
-            UI._sessionTimeoutInterval = setInterval(function () {
-
-                const timeSinceLastActivityInS = (Date.now() - UI.rfb.lastActiveAt) / 1000;
-                let idleDisconnectInS = 1200; //20 minute default 
-                if (Number.isFinite(parseFloat(UI.rfb.idleDisconnect))) {
-                    idleDisconnectInS = parseFloat(UI.rfb.idleDisconnect) * 60;
-                }
-
-                if (timeSinceLastActivityInS > idleDisconnectInS) {
-                    parent.postMessage({ action: 'idle_session_timeout', value: 'Idle session timeout exceeded' }, '*');
-                } else {
-                    //send keep-alive
-                    UI.rfb.sendKey(1, null, false);
-                }
-            }, 5000);
-        } else {
-            document.getElementById('noVNC_status').style.visibility = "visible";
-        }
-
-        //key events for KasmVNC control
-        document.addEventListener('keyup', function (event) {
-            if (event.ctrlKey && event.shiftKey) {
-                switch (event.keyCode) {
-                    case 49:
-                        UI.toggleNav();
-                        break;
-                    case 50:
-                        UI.toggleRelativePointer();
-                        break;
-                    case 51:
-                        UI.togglePointerLock();
-                        break;
-                }
-            }
-
-        }, true);
     },
 
     disconnect() {
