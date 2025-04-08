@@ -246,6 +246,8 @@ const UI = {
         UI.initSetting('host', window.location.hostname);
         UI.initSetting('port', port);
         UI.initSetting('encrypt', (window.location.protocol === "https:"));
+        UI.initSetting('password');
+        UI.initSetting('autoconnect', false);
         UI.initSetting('view_clip', false);
         /* UI.initSetting('resize', 'off'); */
         UI.initSetting('quality', 6);
@@ -1480,10 +1482,12 @@ const UI = {
         url += '/' + path;
 
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
-        url.href,
-        { shared: UI.getSetting('shared'),
-          repeaterID: UI.getSetting('repeaterID'),
-          credentials: { password: password ? password : 'Demo123@' } });
+            url.href,
+            {
+                shared: UI.getSetting('shared'),
+                repeaterID: UI.getSetting('repeaterID'),
+                credentials: { password: password }
+            });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         UI.rfb.addEventListener("serververification", UI.serverVerify);
@@ -1605,7 +1609,6 @@ const UI = {
             }
 
         }, true);
-
 
     },
 
