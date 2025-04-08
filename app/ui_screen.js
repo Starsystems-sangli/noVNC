@@ -347,50 +347,6 @@ const UI = {
         UI.disconnect();
     },
 
-    credentials(e) {
-        // FIXME: handle more types
-
-        document.getElementById("noVNC_username_block").classList.remove("noVNC_hidden");
-        document.getElementById("noVNC_password_block").classList.remove("noVNC_hidden");
-
-        let inputFocus = "none";
-        if (e.detail.types.indexOf("username") === -1) {
-            document.getElementById("noVNC_username_block").classList.add("noVNC_hidden");
-        } else {
-            inputFocus = inputFocus === "none" ? "noVNC_username_input" : inputFocus;
-        }
-        if (e.detail.types.indexOf("password") === -1) {
-            document.getElementById("noVNC_password_block").classList.add("noVNC_hidden");
-        } else {
-            inputFocus = inputFocus === "none" ? "noVNC_password_input" : inputFocus;
-        }
-        document.getElementById('noVNC_credentials_dlg')
-            .classList.add('noVNC_open');
-
-        setTimeout(() => document
-            .getElementById(inputFocus).focus(), 100);
-
-        Log.Warn("Server asked for credentials");
-        UI.showStatus(_("Credentials are required"), "warning");
-    },
-
-    setCredentials(e) {
-        // Prevent actually submitting the form
-        e.preventDefault();
-
-        let inputElemUsername = document.getElementById('noVNC_username_input');
-        const username = inputElemUsername.value;
-
-        let inputElemPassword = document.getElementById('noVNC_password_input');
-        const password = inputElemPassword.value;
-        // Clear the input after reading the password
-        inputElemPassword.value = "";
-
-        UI.rfb.sendCredentials({ username: username, password: password });
-        UI.reconnectPassword = password;
-        document.getElementById('noVNC_credentials_dlg')
-            .classList.remove('noVNC_open');
-    },
 
     updateVisualState(state) {
         document.documentElement.classList.remove("noVNC_connecting");

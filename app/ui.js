@@ -456,8 +456,6 @@ const UI = {
             .addEventListener('click', UI.rejectServer);
         document.getElementById("noVNC_credentials_button")
             .addEventListener('click', UI.setCredentials);
-        document.getElementById("noVNC_credentials_button")
-            .addEventListener('click', UI.setCredentials);
 
     },
 
