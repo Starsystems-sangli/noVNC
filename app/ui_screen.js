@@ -20,9 +20,9 @@ const UI = {
 
     //Render default UI
     start() {
-        window.addEventListener("unload", (e) => {
-            if (UI.rfb) {
-                UI.disconnect();
+        window.addEventListener("unload", (e) => { 
+            if (UI.rfb) { 
+                UI.disconnect(); 
             }
         });
 
@@ -122,7 +122,7 @@ const UI = {
             val = default_value;
         }
         if (typeof val !== 'undefined' && val !== null && isBool) {
-            if (val.toString().toLowerCase() in { '0': 1, 'no': 1, 'false': 1 }) {
+            if (val.toString().toLowerCase() in {'0': 1, 'no': 1, 'false': 1}) {
                 val = false;
             } else {
                 val = true;
@@ -144,18 +144,18 @@ const UI = {
 
         if (!UI.rfb) {
             UI.rfb = new RFB(document.getElementById('noVNC_container'),
-                document.getElementById('noVNC_keyboardinput'),
-                "", //URL
-                {
-                    shared: UI.getSetting('shared', true),
-                    repeaterID: UI.getSetting('repeaterID', false),
-                    credentials: { password: null },
-                    hiDpi: UI.getSetting('enable_hidpi', true, false)
-                },
-                false // Not a primary display
-            );
+                        document.getElementById('noVNC_keyboardinput'),
+                        "", //URL
+                        { 
+                            shared: UI.getSetting('shared', true),
+                            repeaterID: UI.getSetting('repeaterID', false),
+                            credentials: { password: null },
+                            hiDpi: UI.getSetting('enable_hidpi', true, false)
+                        },
+                        false // Not a primary display
+                    );
         }
-
+        
 
         UI.rfb.addEventListener("connect", UI.connectFinished);
         //UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
@@ -216,99 +216,8 @@ const UI = {
             // explicitly request permission to the clipboard
             navigator.permissions.query({ name: "clipboard-read" })
                 .then((result) => { Log.Debug('binary clipboard enabled') })
-                .catch(() => { });
+                .catch(() => {});
         }
-    },
-
-    disconnect() {
-        UI.rfb.disconnect();
-
-        UI.connected = false;
-
-        // Disable automatic reconnecting
-        UI.inhibitReconnect = true;
-
-        UI.updateVisualState('disconnecting');
-
-        // Don't display the connection settings until we're actually disconnected
-    },
-
-    reconnect() {
-        UI.reconnectCallback = null;
-
-        // if reconnect has been disabled in the meantime, do nothing.
-        if (UI.inhibitReconnect) {
-            return;
-        }
-
-        UI.connect(null, UI.reconnectPassword);
-    },
-
-    cancelReconnect() {
-        if (UI.reconnectCallback !== null) {
-            clearTimeout(UI.reconnectCallback);
-            UI.reconnectCallback = null;
-        }
-
-        UI.updateVisualState('disconnected');
-
-        UI.openControlbar();
-        UI.openConnectPanel();
-    },
-
-    connectFinished(e) {
-        UI.connected = true;
-        UI.inhibitReconnect = false;
-
-        let msg;
-        if (UI.getSetting('encrypt')) {
-            msg = _("Connected (encrypted) to ") + UI.desktopName;
-        } else {
-            msg = _("Connected (unencrypted) to ") + UI.desktopName;
-        }
-        UI.showStatus(msg);
-        UI.updateVisualState('connected');
-
-        // Do this last because it can only be used on rendered elements
-        UI.rfb.focus();
-    },
-
-    disconnectFinished(e) {
-        const wasConnected = UI.connected;
-
-        // This variable is ideally set when disconnection starts, but
-        // when the disconnection isn't clean or if it is initiated by
-        // the server, we need to do it here as well since
-        // UI.disconnect() won't be used in those cases.
-        UI.connected = false;
-
-        UI.rfb = undefined;
-
-        if (!e.detail.clean) {
-            UI.updateVisualState('disconnected');
-            if (wasConnected) {
-                UI.showStatus(_("Something went wrong, connection is closed"),
-                    'error');
-            } else {
-                UI.showStatus(_("Failed to connect to server"), 'error');
-            }
-        }
-        // If reconnecting is allowed process it now
-        if (UI.getSetting('reconnect', false) === true && !UI.inhibitReconnect) {
-            UI.updateVisualState('reconnecting');
-
-            const delay = parseInt(UI.getSetting('reconnect_delay'));
-            UI.reconnectCallback = setTimeout(UI.reconnect, delay);
-            return;
-        } else {
-            UI.updateVisualState('disconnected');
-            UI.showStatus(_("Disconnected"), 'normal');
-        }
-
-        document.title = PAGE_TITLE;
-
-        UI.openControlbar();
-        UI.openConnectPanel();
     },
 
     handleControlMessage(event) {
@@ -322,32 +231,6 @@ const UI = {
         }
     },
 
-    async serverVerify(e) {
-        const type = e.detail.type;
-        if (type === 'RSA') {
-            const publickey = e.detail.publickey;
-            let fingerprint = await window.crypto.subtle.digest("SHA-1", publickey);
-            // The same fingerprint format as RealVNC
-            fingerprint = Array.from(new Uint8Array(fingerprint).slice(0, 8)).map(
-                x => x.toString(16).padStart(2, '0')).join('-');
-            document.getElementById('noVNC_verify_server_dlg').classList.add('noVNC_open');
-            document.getElementById('noVNC_fingerprint').innerHTML = fingerprint;
-        }
-    },
-
-    approveServer(e) {
-        e.preventDefault();
-        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
-        UI.rfb.approveServer();
-    },
-
-    rejectServer(e) {
-        e.preventDefault();
-        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
-        UI.disconnect();
-    },
-
-
     updateVisualState(state) {
         document.documentElement.classList.remove("noVNC_connecting");
         document.documentElement.classList.remove("noVNC_connected");
@@ -356,8 +239,9 @@ const UI = {
         document.documentElement.classList.remove("noVNC_disconnected");
 
         const transitionElem = document.getElementById("noVNC_transition_text");
-        if (WebUtil.isInsideKasmVDI()) {
-            parent.postMessage({ action: 'connection_state', value: state }, '*');
+        if (WebUtil.isInsideKasmVDI())         
+        {
+            parent.postMessage({ action: 'connection_state', value: state}, '*' );
         }
 
         let connect_el = document.getElementById('noVNC_connect_dlg');
@@ -483,7 +367,7 @@ const UI = {
             if (UI.supportsBroadcastChannel) {
                 UI.controlChannel.removeEventListener('message', UI.handleControlMessage);
                 UI.rfb.removeEventListener("connect", UI.connectFinished);
-            }
+            }    
         }
     },
 
@@ -532,8 +416,8 @@ const UI = {
         return val;
     },
 
-    // Apply remote resizing or local scaling
-    applyResizeMode() {
+     // Apply remote resizing or local scaling
+     applyResizeMode() {
         if (!UI.rfb) return;
         const resize_setting = UI.getSetting('resize');
         UI.rfb.clipViewport = resize_setting !== 'off';
