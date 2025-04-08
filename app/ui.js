@@ -437,11 +437,24 @@ const UI = {
     addConnectionControlHandlers() {
         UI.addClickHandle('noVNC_disconnect_button', UI.disconnect);
 
-        var connect_btn_el = document.getElementById("noVNC_connect_button_2");
-        if (typeof(connect_btn_el) != 'undefined' && connect_btn_el != null)
-        {
-            connect_btn_el.addEventListener('click', UI.connect);
-        }
+        // var connect_btn_el = document.getElementById("noVNC_connect_button_2");
+        // if (typeof(connect_btn_el) != 'undefined' && connect_btn_el != null)
+        // {
+        //     connect_btn_el.addEventListener('click', UI.connect);
+        // }
+        document.getElementById("noVNC_disconnect_button")
+            .addEventListener('click', UI.disconnect);
+        document.getElementById("noVNC_connect_button")
+            .addEventListener('click', UI.connect);
+        document.getElementById("noVNC_cancel_reconnect_button")
+            .addEventListener('click', UI.cancelReconnect);
+
+        document.getElementById("noVNC_approve_server_button")
+            .addEventListener('click', UI.approveServer);
+        document.getElementById("noVNC_reject_server_button")
+            .addEventListener('click', UI.rejectServer);
+        document.getElementById("noVNC_credentials_button")
+            .addEventListener('click', UI.setCredentials);
         document.getElementById("noVNC_credentials_button")
             .addEventListener('click', UI.setCredentials);
 

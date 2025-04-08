@@ -158,7 +158,7 @@ const UI = {
         
 
         UI.rfb.addEventListener("connect", UI.connectFinished);
-        //UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
+        UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         //TODO: add support for forced static resolution for multiple monitors
         //UI.rfb.forcedResolutionX = UI.getSetting('forced_resolution_x', false);
         //UI.rfb.forcedResolutionY = UI.getSetting('forced_resolution_y', false);
@@ -220,6 +220,97 @@ const UI = {
         }
     },
 
+    disconnect() {
+        UI.rfb.disconnect();
+
+        UI.connected = false;
+
+        // Disable automatic reconnecting
+        UI.inhibitReconnect = true;
+
+        UI.updateVisualState('disconnecting');
+
+        // Don't display the connection settings until we're actually disconnected
+    },
+
+    reconnect() {
+        UI.reconnectCallback = null;
+
+        // if reconnect has been disabled in the meantime, do nothing.
+        if (UI.inhibitReconnect) {
+            return;
+        }
+
+        UI.connect(null, UI.reconnectPassword);
+    },
+
+    cancelReconnect() {
+        if (UI.reconnectCallback !== null) {
+            clearTimeout(UI.reconnectCallback);
+            UI.reconnectCallback = null;
+        }
+
+        UI.updateVisualState('disconnected');
+
+        UI.openControlbar();
+        UI.openConnectPanel();
+    },
+
+    connectFinished(e) {
+        UI.connected = true;
+        UI.inhibitReconnect = false;
+
+        let msg;
+        if (UI.getSetting('encrypt')) {
+            msg = _("Connected (encrypted) to ") + UI.desktopName;
+        } else {
+            msg = _("Connected (unencrypted) to ") + UI.desktopName;
+        }
+        UI.showStatus(msg);
+        UI.updateVisualState('connected');
+
+        // Do this last because it can only be used on rendered elements
+        UI.rfb.focus();
+    },
+
+    disconnectFinished(e) {
+        const wasConnected = UI.connected;
+
+        // This variable is ideally set when disconnection starts, but
+        // when the disconnection isn't clean or if it is initiated by
+        // the server, we need to do it here as well since
+        // UI.disconnect() won't be used in those cases.
+        UI.connected = false;
+
+        UI.rfb = undefined;
+
+        if (!e.detail.clean) {
+            UI.updateVisualState('disconnected');
+            if (wasConnected) {
+                UI.showStatus(_("Something went wrong, connection is closed"),
+                              'error');
+            } else {
+                UI.showStatus(_("Failed to connect to server"), 'error');
+            }
+        }
+        // If reconnecting is allowed process it now
+        if (UI.getSetting('reconnect', false) === true && !UI.inhibitReconnect) {
+            UI.updateVisualState('reconnecting');
+
+            const delay = parseInt(UI.getSetting('reconnect_delay'));
+            UI.reconnectCallback = setTimeout(UI.reconnect, delay);
+            return;
+        } else {
+            UI.updateVisualState('disconnected');
+            UI.showStatus(_("Disconnected"), 'normal');
+        }
+
+        document.title = PAGE_TITLE;
+
+        UI.openControlbar();
+        UI.openConnectPanel();
+    },
+
     handleControlMessage(event) {
         switch (event.data.eventType) {
             case 'identify':
@@ -229,6 +320,31 @@ const UI = {
                 UI.updateVisualState('disconnected');
                 break;
         }
+    },
+
+    async serverVerify(e) {
+        const type = e.detail.type;
+        if (type === 'RSA') {
+            const publickey = e.detail.publickey;
+            let fingerprint = await window.crypto.subtle.digest("SHA-1", publickey);
+            // The same fingerprint format as RealVNC
+            fingerprint = Array.from(new Uint8Array(fingerprint).slice(0, 8)).map(
+                x => x.toString(16).padStart(2, '0')).join('-');
+            document.getElementById('noVNC_verify_server_dlg').classList.add('noVNC_open');
+            document.getElementById('noVNC_fingerprint').innerHTML = fingerprint;
+        }
+    },
+
+    approveServer(e) {
+        e.preventDefault();
+        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
+        UI.rfb.approveServer();
+    },
+
+    rejectServer(e) {
+        e.preventDefault();
+        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
+        UI.disconnect();
     },
 
     credentials(e) {
