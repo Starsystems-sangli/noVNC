@@ -442,7 +442,7 @@ const UI = {
         //     connect_btn_el.addEventListener('click', UI.connect);
         // }
         document.getElementById("noVNC_connect_button")
-            .addEventListener('click', UI.showPasswordPrompt);
+            .addEventListener('click', UI.credentials);
         document.getElementById("noVNC_credentials_button")
             .addEventListener('click', UI.setCredentials);
 
