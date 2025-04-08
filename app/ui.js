@@ -442,7 +442,7 @@ const UI = {
         //     connect_btn_el.addEventListener('click', UI.connect);
         // }
         document.getElementById("noVNC_connect_button")
-            .addEventListener('click', UI.credentials);
+            .addEventListener('click', UI.showPasswordPrompt);
         document.getElementById("noVNC_credentials_button")
             .addEventListener('click', UI.setCredentials);
 
@@ -1697,8 +1697,10 @@ const UI = {
     },
 
     showPasswordPrompt() {
-        document.getElementById('noVNC_password_dlg').classList.remove("noVNC_hidden");
-        document.getElementById('noVNC_password_input').focus();
+        document.getElementById("noVNC_username_block").classList.remove("noVNC_hidden");
+        document.getElementById("noVNC_password_block").classList.remove("noVNC_hidden");
+        document.getElementById('noVNC_credentials_dlg')
+            .classList.add('noVNC_open');
     },
 
     credentials(e) {
