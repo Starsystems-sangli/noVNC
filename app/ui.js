@@ -247,7 +247,7 @@ const UI = {
         UI.initSetting('port', port);
         UI.initSetting('encrypt', (window.location.protocol === "https:"));
         UI.initSetting('password');
-        UI.initSetting('autoconnect', false);
+        // UI.initSetting('autoconnect', false);
         UI.initSetting('view_clip', false);
         /* UI.initSetting('resize', 'off'); */
         UI.initSetting('quality', 6);
@@ -1146,10 +1146,10 @@ const UI = {
         if (ctrl === null) {
             return;
         }
-        if (ctrl?.type === 'checkbox') {
+        if (ctrl.type === 'checkbox') {
             ctrl.checked = value;
 
-        } else if (typeof ctrl?.options !== 'undefined') {
+        } else if (typeof ctrl.options !== 'undefined') {
             value = String(value);
             for (let i = 0; i < ctrl.options.length; i += 1) {
                 if (ctrl.options[i].value === value) {
