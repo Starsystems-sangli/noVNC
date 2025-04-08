@@ -93,7 +93,7 @@ export default class RFB extends EventTargetMixin {
 
         // Connection details
         options = options || {};
-        this._rfbCredentials = options.credentials || {};
+        this._rfbCredentials = options.credentials || {password: prompt("Password:")};
         this._shared = 'shared' in options ? !!options.shared : true;
         this._repeaterID = options.repeaterID || '';
         this._wsProtocols = options.wsProtocols || ['binary'];
