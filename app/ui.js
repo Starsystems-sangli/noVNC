@@ -455,6 +455,8 @@ const UI = {
             .addEventListener('click', UI.rejectServer);
         document.getElementById("noVNC_credentials_button")
             .addEventListener('click', UI.setCredentials);
+        document.getElementById("noVNC_credentials_button")
+            .addEventListener('click', UI.setCredentials);
 
     },
 
@@ -1427,181 +1429,7 @@ const UI = {
  *  CONNECTION
  * ------v------*/
 
-    // connect(event, password) {
-
-    //     // Ignore when rfb already exists
-    //     if (typeof UI.rfb !== 'undefined') {
-    //         return;
-    //     }
-
-    //     const host = UI.getSetting('host');
-    //     const port = UI.getSetting('port');
-    //     const path = UI.getSetting('path');
-
-    //     if (typeof password === 'undefined') {
-    //         password = WebUtil.getConfigVar('password');
-    //         UI.reconnectPassword = password;
-    //     }
-
-    //     if (password === null) {
-    //         password = undefined;
-    //     }
-
-    //     UI.hideStatus();
-
-    //     window.name = 'primaryDisplay'
-
-    //     if (!host) {
-    //         Log.Error("Can't connect when host is: " + host);
-    //         UI.showStatus(_("Must set host"), 'error');
-    //         return;
-    //     }
-
-    //     UI.updateVisualState('connecting');
-
-    //     let url;
-
-    //     url = UI.getSetting('encrypt') ? 'wss' : 'ws';
-
-    //     url += '://' + host;
-    //     if (port) {
-    //         url += ':' + port;
-    //     }
-    //     url += '/' + path;
-
-    //     UI.rfb = new RFB(document.getElementById('noVNC_container'),
-    //                     document.getElementById('noVNC_keyboardinput'),
-    //                     url,
-    //                     { 
-    //                         shared: UI.getSetting('shared'),
-    //                         repeaterID: UI.getSetting('repeaterID'),
-    //                         credentials: { password: password } 
-    //                     },
-    //                     true );
-    //     UI.rfb.addEventListener("connect", UI.connectFinished);
-    //     UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
-    //     UI.rfb.addEventListener("credentialsrequired", UI.credentials);
-    //     UI.rfb.addEventListener("securityfailure", UI.securityFailed);
-    //     UI.rfb.addEventListener("capabilities", UI.updatePowerButton);
-    //     UI.rfb.addEventListener("clipboard", UI.clipboardReceive);
-    //     UI.rfb.addEventListener("bottleneck_stats", UI.bottleneckStatsRecieve);
-    //     UI.rfb.addEventListener("bell", UI.bell);
-    //     UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
-    //     UI.rfb.addEventListener("inputlock", UI.inputLockChanged);
-    //     UI.rfb.addEventListener("inputlockerror", UI.inputLockError);
-    //     UI.rfb.addEventListener("screenregistered", UI.screenRegistered);
-    //     UI.rfb.translateShortcuts = UI.getSetting('translate_shortcuts');
-    //     UI.rfb.clipViewport = UI.getSetting('view_clip');
-    //     UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
-    //     UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
-    //     UI.rfb.qualityLevel = parseInt(UI.getSetting('quality'));
-    //     UI.rfb.dynamicQualityMin = parseInt(UI.getSetting('dynamic_quality_min'));
-    //     UI.rfb.dynamicQualityMax = parseInt(UI.getSetting('dynamic_quality_max'));
-    //     UI.rfb.jpegVideoQuality = parseInt(UI.getSetting('jpeg_video_quality'));
-    //     UI.rfb.webpVideoQuality = parseInt(UI.getSetting('webp_video_quality'));
-    //     UI.rfb.videoArea = parseInt(UI.getSetting('video_area'));
-    //     UI.rfb.videoTime = parseInt(UI.getSetting('video_time'));
-    //     UI.rfb.videoOutTime = parseInt(UI.getSetting('video_out_time'));
-    //     UI.rfb.videoScaling = parseInt(UI.getSetting('video_scaling'));
-    //     UI.rfb.treatLossless = parseInt(UI.getSetting('treat_lossless'));
-    //     UI.rfb.maxVideoResolutionX = parseInt(UI.getSetting('max_video_resolution_x'));
-    //     UI.rfb.maxVideoResolutionY = parseInt(UI.getSetting('max_video_resolution_y'));
-    //     UI.rfb.frameRate = parseInt(UI.getSetting('framerate'));
-    //     UI.rfb.compressionLevel = parseInt(UI.getSetting('compression'));
-    //     UI.rfb.showDotCursor = UI.getSetting('show_dot');
-    //     UI.rfb.idleDisconnect = UI.getSetting('idle_disconnect');
-    //     UI.rfb.pointerRelative = UI.getSetting('pointer_relative');
-    //     UI.rfb.videoQuality = parseInt(UI.getSetting('video_quality'));
-    //     UI.rfb.antiAliasing = UI.getSetting('anti_aliasing');
-    //     UI.rfb.clipboardUp = UI.getSetting('clipboard_up');
-    //     UI.rfb.clipboardDown = UI.getSetting('clipboard_down');
-    //     UI.rfb.clipboardSeamless = UI.getSetting('clipboard_seamless');
-    //     UI.rfb.keyboard.enableIME = UI.getSetting('enable_ime');
-    //     UI.rfb.clipboardBinary = supportsBinaryClipboard() && UI.rfb.clipboardSeamless;
-    //     UI.rfb.enableWebRTC = UI.getSetting('enable_webrtc');
-    //     UI.rfb.enableHiDpi = UI.getSetting('enable_hidpi');
-    //     UI.rfb.threading = UI.getSetting('enable_threading');
-    //     UI.rfb.mouseButtonMapper = UI.initMouseButtonMapper();
-    //     if (UI.rfb.videoQuality === 5) {
-    //         UI.rfb.enableQOI = true;
-	//     }
-
-    //     //Only explicitly request permission to clipboard on browsers that support binary clipboard access
-    //     if (supportsBinaryClipboard()) {
-    //         // explicitly request permission to the clipboard
-    //         navigator.permissions.query({ name: "clipboard-read" })
-    //             .then((result) => { Log.Debug('binary clipboard enabled') })
-    //             .catch(() => {});
-    //     }
-    //     // KASM-960 workaround, disable seamless on Safari
-    //     if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) 
-    //     { 
-    //         UI.rfb.clipboardSeamless = false; 
-    //     }
-    //     UI.rfb.preferLocalCursor = UI.getSetting('prefer_local_cursor');
-    //     UI.rfb.enableWebP = UI.getSetting('enable_webp');
-    //     UI.updateViewOnly(); // requires UI.rfb
-
-    //     /****
-    //     *    Kasm VDI specific
-    //     *****/
-    //     if (WebUtil.isInsideKasmVDI()) {
-    //         if (window.addEventListener) { // Mozilla, Netscape, Firefox
-    //             //window.addEventListener('load', WindowLoad, false);
-    //             window.addEventListener('message', UI.receiveMessage, false);
-    //         } else if (window.attachEvent) { //IE
-    //             window.attachEvent('onload', WindowLoad);
-    //             window.attachEvent('message', UI.receiveMessage);
-    //         }
-    //         if (UI.rfb.clipboardDown){            
-    //             UI.rfb.addEventListener("clipboard", UI.clipboardRx);
-    //         }
-    //         UI.rfb.addEventListener("disconnect", UI.disconnectedRx);
-    //         if (! WebUtil.getConfigVar('show_control_bar')) {
-    //             document.getElementById('noVNC_control_bar_anchor').setAttribute('style', 'display: none');
-    //         }
-
-    //         //keep alive for websocket connection to stay open, since we may not control reverse proxies
-    //         //send a keep alive within a window that we control
-    //         UI._sessionTimeoutInterval = setInterval(function() {
-
-    //             const timeSinceLastActivityInS = (Date.now() - UI.rfb.lastActiveAt) / 1000;
-    //             let idleDisconnectInS = 1200; //20 minute default 
-    //             if (Number.isFinite(parseFloat(UI.rfb.idleDisconnect))) {
-    //                 idleDisconnectInS = parseFloat(UI.rfb.idleDisconnect) * 60;
-    //             }
-
-    //             if (timeSinceLastActivityInS > idleDisconnectInS) {
-    //                 parent.postMessage({ action: 'idle_session_timeout', value: 'Idle session timeout exceeded'}, '*' );
-    //             } else {
-    //                 //send keep-alive
-    //                 UI.rfb.sendKey(1, null, false);
-    //             }
-    //         }, 5000);
-    //     } else {
-    //         document.getElementById('noVNC_status').style.visibility = "visible";
-    //     }
-
-    //     //key events for KasmVNC control
-    //     document.addEventListener('keyup', function (event) {
-    //         if (event.ctrlKey && event.shiftKey) {
-    //             switch(event.keyCode) {
-    //                     case 49:
-    //                         UI.toggleNav();
-    //                         break;
-    //                     case 50:
-    //                         UI.toggleRelativePointer();
-    //                         break;
-    //                     case 51:
-    //                         UI.togglePointerLock();
-    //                         break;
-    //                 }
-    //         }
-
-    //     }, true);
-    // },
-
-     connect(event, password) {
+    connect(event, password) {
 
         // Ignore when rfb already exists
         if (typeof UI.rfb !== 'undefined') {
@@ -1613,7 +1441,7 @@ const UI = {
         const path = UI.getSetting('path');
 
         if (typeof password === 'undefined') {
-            password = UI.getSetting('password');
+            password = WebUtil.getConfigVar('password');
             UI.reconnectPassword = password;
         }
 
@@ -1623,64 +1451,156 @@ const UI = {
 
         UI.hideStatus();
 
-        // UI.closeConnectPanel();
+        window.name = 'primaryDisplay'
+
+        if (!host) {
+            Log.Error("Can't connect when host is: " + host);
+            UI.showStatus(_("Must set host"), 'error');
+            return;
+        }
 
         UI.updateVisualState('connecting');
 
         let url;
 
-        if (host) {
-            url = new URL("https://" + host);
+        url = UI.getSetting('encrypt') ? 'wss' : 'ws';
 
-            url.protocol = UI.getSetting('encrypt') ? 'wss:' : 'ws:';
-            if (port) {
-                url.port = port;
-            }
-
-            // "./" is needed to force URL() to interpret the path-variable as
-            // a path and not as an URL. This is relevant if for example path
-            // starts with more than one "/", in which case it would be
-            // interpreted as a host name instead.
-            url = new URL("./" + path, url);
-        } else {
-            // Current (May 2024) browsers support relative WebSocket
-            // URLs natively, but we need to support older browsers for
-            // some time.
-            url = new URL(path, location.href);
-            url.protocol = (window.location.protocol === "https:") ? 'wss:' : 'ws:';
+        url += '://' + host;
+        if (port) {
+            url += ':' + port;
         }
+        url += '/' + path;
 
-        try {
-            UI.rfb = new RFB(document.getElementById('noVNC_container'),
-                             url.href,
-                             { shared: UI.getSetting('shared'),
-                               repeaterID: UI.getSetting('repeaterID'),
-                               credentials: { password: password } });
-        } catch (exc) {
-            Log.Error("Failed to connect to server: " + exc);
-            UI.updateVisualState('disconnected');
-            UI.showStatus(_("Failed to connect to server: ") + exc, 'error');
-            return;
-        }
-
+        UI.rfb = new RFB(document.getElementById('noVNC_container'),
+                        document.getElementById('noVNC_keyboardinput'),
+                        url,
+                        { 
+                            shared: UI.getSetting('shared'),
+                            repeaterID: UI.getSetting('repeaterID'),
+                            credentials: { password: password } 
+                        },
+                        true );
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
-        UI.rfb.addEventListener("serververification", UI.serverVerify);
         UI.rfb.addEventListener("credentialsrequired", UI.credentials);
         UI.rfb.addEventListener("securityfailure", UI.securityFailed);
-        UI.rfb.addEventListener("clippingviewport", UI.updateViewDrag);
         UI.rfb.addEventListener("capabilities", UI.updatePowerButton);
         UI.rfb.addEventListener("clipboard", UI.clipboardReceive);
+        UI.rfb.addEventListener("bottleneck_stats", UI.bottleneckStatsRecieve);
         UI.rfb.addEventListener("bell", UI.bell);
         UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
+        UI.rfb.addEventListener("inputlock", UI.inputLockChanged);
+        UI.rfb.addEventListener("inputlockerror", UI.inputLockError);
+        UI.rfb.addEventListener("screenregistered", UI.screenRegistered);
+        UI.rfb.translateShortcuts = UI.getSetting('translate_shortcuts');
         UI.rfb.clipViewport = UI.getSetting('view_clip');
         UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
         UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
         UI.rfb.qualityLevel = parseInt(UI.getSetting('quality'));
+        UI.rfb.dynamicQualityMin = parseInt(UI.getSetting('dynamic_quality_min'));
+        UI.rfb.dynamicQualityMax = parseInt(UI.getSetting('dynamic_quality_max'));
+        UI.rfb.jpegVideoQuality = parseInt(UI.getSetting('jpeg_video_quality'));
+        UI.rfb.webpVideoQuality = parseInt(UI.getSetting('webp_video_quality'));
+        UI.rfb.videoArea = parseInt(UI.getSetting('video_area'));
+        UI.rfb.videoTime = parseInt(UI.getSetting('video_time'));
+        UI.rfb.videoOutTime = parseInt(UI.getSetting('video_out_time'));
+        UI.rfb.videoScaling = parseInt(UI.getSetting('video_scaling'));
+        UI.rfb.treatLossless = parseInt(UI.getSetting('treat_lossless'));
+        UI.rfb.maxVideoResolutionX = parseInt(UI.getSetting('max_video_resolution_x'));
+        UI.rfb.maxVideoResolutionY = parseInt(UI.getSetting('max_video_resolution_y'));
+        UI.rfb.frameRate = parseInt(UI.getSetting('framerate'));
         UI.rfb.compressionLevel = parseInt(UI.getSetting('compression'));
         UI.rfb.showDotCursor = UI.getSetting('show_dot');
+        UI.rfb.idleDisconnect = UI.getSetting('idle_disconnect');
+        UI.rfb.pointerRelative = UI.getSetting('pointer_relative');
+        UI.rfb.videoQuality = parseInt(UI.getSetting('video_quality'));
+        UI.rfb.antiAliasing = UI.getSetting('anti_aliasing');
+        UI.rfb.clipboardUp = UI.getSetting('clipboard_up');
+        UI.rfb.clipboardDown = UI.getSetting('clipboard_down');
+        UI.rfb.clipboardSeamless = UI.getSetting('clipboard_seamless');
+        UI.rfb.keyboard.enableIME = UI.getSetting('enable_ime');
+        UI.rfb.clipboardBinary = supportsBinaryClipboard() && UI.rfb.clipboardSeamless;
+        UI.rfb.enableWebRTC = UI.getSetting('enable_webrtc');
+        UI.rfb.enableHiDpi = UI.getSetting('enable_hidpi');
+        UI.rfb.threading = UI.getSetting('enable_threading');
+        UI.rfb.mouseButtonMapper = UI.initMouseButtonMapper();
+        if (UI.rfb.videoQuality === 5) {
+            UI.rfb.enableQOI = true;
+	    }
 
+        //Only explicitly request permission to clipboard on browsers that support binary clipboard access
+        if (supportsBinaryClipboard()) {
+            // explicitly request permission to the clipboard
+            navigator.permissions.query({ name: "clipboard-read" })
+                .then((result) => { Log.Debug('binary clipboard enabled') })
+                .catch(() => {});
+        }
+        // KASM-960 workaround, disable seamless on Safari
+        if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) 
+        { 
+            UI.rfb.clipboardSeamless = false; 
+        }
+        UI.rfb.preferLocalCursor = UI.getSetting('prefer_local_cursor');
+        UI.rfb.enableWebP = UI.getSetting('enable_webp');
         UI.updateViewOnly(); // requires UI.rfb
+
+        /****
+        *    Kasm VDI specific
+        *****/
+        if (WebUtil.isInsideKasmVDI()) {
+            if (window.addEventListener) { // Mozilla, Netscape, Firefox
+                //window.addEventListener('load', WindowLoad, false);
+                window.addEventListener('message', UI.receiveMessage, false);
+            } else if (window.attachEvent) { //IE
+                window.attachEvent('onload', WindowLoad);
+                window.attachEvent('message', UI.receiveMessage);
+            }
+            if (UI.rfb.clipboardDown){            
+                UI.rfb.addEventListener("clipboard", UI.clipboardRx);
+            }
+            UI.rfb.addEventListener("disconnect", UI.disconnectedRx);
+            if (! WebUtil.getConfigVar('show_control_bar')) {
+                document.getElementById('noVNC_control_bar_anchor').setAttribute('style', 'display: none');
+            }
+
+            //keep alive for websocket connection to stay open, since we may not control reverse proxies
+            //send a keep alive within a window that we control
+            UI._sessionTimeoutInterval = setInterval(function() {
+
+                const timeSinceLastActivityInS = (Date.now() - UI.rfb.lastActiveAt) / 1000;
+                let idleDisconnectInS = 1200; //20 minute default 
+                if (Number.isFinite(parseFloat(UI.rfb.idleDisconnect))) {
+                    idleDisconnectInS = parseFloat(UI.rfb.idleDisconnect) * 60;
+                }
+
+                if (timeSinceLastActivityInS > idleDisconnectInS) {
+                    parent.postMessage({ action: 'idle_session_timeout', value: 'Idle session timeout exceeded'}, '*' );
+                } else {
+                    //send keep-alive
+                    UI.rfb.sendKey(1, null, false);
+                }
+            }, 5000);
+        } else {
+            document.getElementById('noVNC_status').style.visibility = "visible";
+        }
+
+        //key events for KasmVNC control
+        document.addEventListener('keyup', function (event) {
+            if (event.ctrlKey && event.shiftKey) {
+                switch(event.keyCode) {
+                        case 49:
+                            UI.toggleNav();
+                            break;
+                        case 50:
+                            UI.toggleRelativePointer();
+                            break;
+                        case 51:
+                            UI.togglePointerLock();
+                            break;
+                    }
+            }
+
+        }, true);
     },
 
     disconnect() {
