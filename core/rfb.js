@@ -760,6 +760,13 @@ export default class RFB extends EventTargetMixin {
         this._rfbCredentials = creds;
         this._resumeAuthentication();
     }
+
+    _resumeAuthentication() {
+        // We use setTimeout() so it's run in its own context, just like
+        // it originally did via the WebSocket's event handler
+        setTimeout(this._initMsg.bind(this), 0);
+    }
+    
     refreshSecondaryDisplays() {
         //send secondary displays new settings
         if (this._display.screens.length > 1) {
