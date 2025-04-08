@@ -1601,7 +1601,7 @@ const UI = {
     //     }, true);
     // },
 
-    connect(event, password) {
+     connect(event, password) {
 
         // Ignore when rfb already exists
         if (typeof UI.rfb !== 'undefined') {
@@ -1623,7 +1623,7 @@ const UI = {
 
         UI.hideStatus();
 
-        UI.closeConnectPanel();
+        // UI.closeConnectPanel();
 
         UI.updateVisualState('connecting');
 
