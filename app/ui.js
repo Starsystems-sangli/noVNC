@@ -1143,6 +1143,9 @@ const UI = {
         let value = UI.getSetting(name);
 
         const ctrl = document.getElementById('noVNC_setting_' + name);
+        if (ctrl === null) {
+            return;
+        }
         if (ctrl.type === 'checkbox') {
             ctrl.checked = value;
 
