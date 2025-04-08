@@ -228,17 +228,11 @@ export default class RFB extends EventTargetMixin {
 
         // Bound event handlers
         this._eventHandlers = {
-            updateHiddenKeyboard: this._updateHiddenKeyboard.bind(this),
             focusCanvas: this._focusCanvas.bind(this),
-            windowResize: this._windowResize.bind(this),
+            handleResize: this._handleResize.bind(this),
             handleMouse: this._handleMouse.bind(this),
-            handlePointerLockChange: this._handlePointerLockChange.bind(this),
-            handlePointerLockError: this._handlePointerLockError.bind(this),
             handleWheel: this._handleWheel.bind(this),
             handleGesture: this._handleGesture.bind(this),
-            handleFocusChange: this._handleFocusChange.bind(this),
-            handleMouseOut: this._handleMouseOut.bind(this),
-            handleVisibilityChange: this._handleVisibilityChange.bind(this),
             handleRSAAESCredentialsRequired: this._handleRSAAESCredentialsRequired.bind(this),
             handleRSAAESServerVerification: this._handleRSAAESServerVerification.bind(this),
         };
