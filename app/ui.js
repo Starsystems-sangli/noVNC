@@ -1490,6 +1490,7 @@ const UI = {
             true);
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
+        UI.rfb.addEventListener("serververification", UI.serverVerify);
         UI.rfb.addEventListener("credentialsrequired", UI.credentials);
         UI.rfb.addEventListener("securityfailure", UI.securityFailed);
         UI.rfb.addEventListener("capabilities", UI.updatePowerButton);
@@ -1551,6 +1552,88 @@ const UI = {
         UI.rfb.enableWebP = UI.getSetting('enable_webp');
         UI.updateViewOnly(); // requires UI.rfb
 
+        /****
+        *    Kasm VDI specific
+        *****/
+        if (WebUtil.isInsideKasmVDI()) {
+            if (window.addEventListener) { // Mozilla, Netscape, Firefox
+                //window.addEventListener('load', WindowLoad, false);
+                window.addEventListener('message', UI.receiveMessage, false);
+            } else if (window.attachEvent) { //IE
+                window.attachEvent('onload', WindowLoad);
+                window.attachEvent('message', UI.receiveMessage);
+            }
+            if (UI.rfb.clipboardDown) {
+                UI.rfb.addEventListener("clipboard", UI.clipboardRx);
+            }
+            UI.rfb.addEventListener("disconnect", UI.disconnectedRx);
+            if (!WebUtil.getConfigVar('show_control_bar')) {
+                document.getElementById('noVNC_control_bar_anchor').setAttribute('style', 'display: none');
+            }
+
+            //keep alive for websocket connection to stay open, since we may not control reverse proxies
+            //send a keep alive within a window that we control
+            UI._sessionTimeoutInterval = setInterval(function () {
+
+                const timeSinceLastActivityInS = (Date.now() - UI.rfb.lastActiveAt) / 1000;
+                let idleDisconnectInS = 1200; //20 minute default 
+                if (Number.isFinite(parseFloat(UI.rfb.idleDisconnect))) {
+                    idleDisconnectInS = parseFloat(UI.rfb.idleDisconnect) * 60;
+                }
+
+                if (timeSinceLastActivityInS > idleDisconnectInS) {
+                    parent.postMessage({ action: 'idle_session_timeout', value: 'Idle session timeout exceeded' }, '*');
+                } else {
+                    //send keep-alive
+                    UI.rfb.sendKey(1, null, false);
+                }
+            }, 5000);
+        } else {
+            document.getElementById('noVNC_status').style.visibility = "visible";
+        }
+
+        //key events for KasmVNC control
+        document.addEventListener('keyup', function (event) {
+            if (event.ctrlKey && event.shiftKey) {
+                switch (event.keyCode) {
+                    case 49:
+                        UI.toggleNav();
+                        break;
+                    case 50:
+                        UI.toggleRelativePointer();
+                        break;
+                    case 51:
+                        UI.togglePointerLock();
+                        break;
+                }
+            }
+
+        }, true);
+    },
+
+    async serverVerify(e) {
+        const type = e.detail.type;
+        if (type === 'RSA') {
+            const publickey = e.detail.publickey;
+            let fingerprint = await window.crypto.subtle.digest("SHA-1", publickey);
+            // The same fingerprint format as RealVNC
+            fingerprint = Array.from(new Uint8Array(fingerprint).slice(0, 8)).map(
+                x => x.toString(16).padStart(2, '0')).join('-');
+            document.getElementById('noVNC_verify_server_dlg').classList.add('noVNC_open');
+            document.getElementById('noVNC_fingerprint').innerHTML = fingerprint;
+        }
+    },
+
+    approveServer(e) {
+        e.preventDefault();
+        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
+        UI.rfb.approveServer();
+    },
+
+    rejectServer(e) {
+        e.preventDefault();
+        document.getElementById('noVNC_verify_server_dlg').classList.remove('noVNC_open');
+        UI.disconnect();
     },
 
     disconnect() {
@@ -1813,6 +1896,52 @@ const UI = {
             UI.showControlbarHint(false);
         }
     },
+
+    credentials(e) {
+        // FIXME: handle more types
+
+        document.getElementById("noVNC_username_block").classList.remove("noVNC_hidden");
+        document.getElementById("noVNC_password_block").classList.remove("noVNC_hidden");
+
+        let inputFocus = "none";
+        if (e.detail.types.indexOf("username") === -1) {
+            document.getElementById("noVNC_username_block").classList.add("noVNC_hidden");
+        } else {
+            inputFocus = inputFocus === "none" ? "noVNC_username_input" : inputFocus;
+        }
+        if (e.detail.types.indexOf("password") === -1) {
+            document.getElementById("noVNC_password_block").classList.add("noVNC_hidden");
+        } else {
+            inputFocus = inputFocus === "none" ? "noVNC_password_input" : inputFocus;
+        }
+        document.getElementById('noVNC_credentials_dlg')
+            .classList.add('noVNC_open');
+
+        setTimeout(() => document
+            .getElementById(inputFocus).focus(), 100);
+
+        Log.Warn("Server asked for credentials");
+        UI.showStatus(_("Credentials are required"), "warning");
+    },
+
+    setCredentials(e) {
+        // Prevent actually submitting the form
+        e.preventDefault();
+
+        let inputElemUsername = document.getElementById('noVNC_username_input');
+        const username = inputElemUsername.value;
+
+        let inputElemPassword = document.getElementById('noVNC_password_input');
+        const password = inputElemPassword.value;
+        // Clear the input after reading the password
+        inputElemPassword.value = "";
+
+        UI.rfb.sendCredentials({ username: username, password: password });
+        UI.reconnectPassword = password;
+        document.getElementById('noVNC_credentials_dlg')
+            .classList.remove('noVNC_open');
+    },
+
 
     clipboardRx(event) {
         parent.postMessage({ action: 'clipboardrx', value: event.detail.text }, '*'); //TODO fix star
