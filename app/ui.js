@@ -440,7 +440,7 @@ const UI = {
         var connect_btn_el = document.getElementById("noVNC_connect_button_2");
         if (typeof (connect_btn_el) != 'undefined' && connect_btn_el != null) {
             connect_btn_el.addEventListener('click', UI.connect);
-        // }
+        }
         document.getElementById("noVNC_connect_button")
             .addEventListener('click', UI.showPasswordPrompt);
         document.getElementById("noVNC_credentials_button")
