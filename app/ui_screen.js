@@ -131,93 +131,174 @@ const UI = {
         return val;
     },
 
-    connect() {
+    // connect() {
 
-        let details = null
-        const initialAutoPlacementValue = window.localStorage.getItem('autoPlacement')
-        if (initialAutoPlacementValue === null) {
-            details = {
-                left: window.screenLeft,
-                top: window.screenTop
-            }
-        }
+    //     let details = null
+    //     const initialAutoPlacementValue = window.localStorage.getItem('autoPlacement')
+    //     if (initialAutoPlacementValue === null) {
+    //         details = {
+    //             left: window.screenLeft,
+    //             top: window.screenTop
+    //         }
+    //     }
 
-        if (!UI.rfb) {
-            UI.rfb = new RFB(document.getElementById('noVNC_container'),
-                        document.getElementById('noVNC_keyboardinput'),
-                        "", //URL
-                        { 
-                            shared: UI.getSetting('shared', true),
-                            repeaterID: UI.getSetting('repeaterID', false),
-                            credentials: { password: null },
-                            hiDpi: UI.getSetting('enable_hidpi', true, false)
-                        },
-                        false // Not a primary display
-                    );
-        }
+    //     if (!UI.rfb) {
+    //         UI.rfb = new RFB(document.getElementById('noVNC_container'),
+    //                     document.getElementById('noVNC_keyboardinput'),
+    //                     "", //URL
+    //                     { 
+    //                         shared: UI.getSetting('shared', true),
+    //                         repeaterID: UI.getSetting('repeaterID', false),
+    //                         credentials: { password: null },
+    //                         hiDpi: UI.getSetting('enable_hidpi', true, false)
+    //                     },
+    //                     false // Not a primary display
+    //                 );
+    //     }
         
+
+    //     UI.rfb.addEventListener("connect", UI.connectFinished);
+    //     UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
+    //     //TODO: add support for forced static resolution for multiple monitors
+    //     //UI.rfb.forcedResolutionX = UI.getSetting('forced_resolution_x', false);
+    //     //UI.rfb.forcedResolutionY = UI.getSetting('forced_resolution_y', false);
+    //     const resize_setting = UI.getSetting('resize', false, 'remote');
+    //     UI.rfb.clipViewport = resize_setting !== 'off';
+    //     UI.rfb.scaleViewport = resize_setting === 'scale';
+    //     UI.rfb.resizeSession = resize_setting === 'remote';
+    //     UI.rfb.qualityLevel = parseInt(UI.getSetting('quality'));
+    //     UI.rfb.dynamicQualityMin = parseInt(UI.getSetting('dynamic_quality_min'));
+    //     UI.rfb.dynamicQualityMax = parseInt(UI.getSetting('dynamic_quality_max'));
+    //     UI.rfb.jpegVideoQuality = parseInt(UI.getSetting('jpeg_video_quality'));
+    //     UI.rfb.webpVideoQuality = parseInt(UI.getSetting('webp_video_quality'));
+    //     UI.rfb.videoArea = parseInt(UI.getSetting('video_area'));
+    //     UI.rfb.videoTime = parseInt(UI.getSetting('video_time'));
+    //     UI.rfb.videoOutTime = parseInt(UI.getSetting('video_out_time'));
+    //     UI.rfb.videoScaling = parseInt(UI.getSetting('video_scaling'));
+    //     UI.rfb.treatLossless = parseInt(UI.getSetting('treat_lossless'));
+    //     UI.rfb.maxVideoResolutionX = parseInt(UI.getSetting('max_video_resolution_x'));
+    //     UI.rfb.maxVideoResolutionY = parseInt(UI.getSetting('max_video_resolution_y'));
+    //     UI.rfb.frameRate = parseInt(UI.getSetting('framerate'));
+    //     UI.rfb.compressionLevel = parseInt(UI.getSetting('compression'));
+    //     UI.rfb.showDotCursor = UI.getSetting('show_dot', true);
+    //     UI.rfb.idleDisconnect = UI.getSetting('idle_disconnect');
+    //     UI.rfb.pointerRelative = UI.getSetting('pointer_relative');
+    //     UI.rfb.videoQuality = parseInt(UI.getSetting('video_quality'));
+    //     UI.rfb.antiAliasing = UI.getSetting('anti_aliasing');
+    //     UI.rfb.clipboardUp = UI.getSetting('clipboard_up', true, true);
+    //     UI.rfb.clipboardDown = UI.getSetting('clipboard_down', true, true);
+    //     let seamlessClip = UI.getSetting('clipboard_seamless', true, true);
+    //     if (isFirefox() || isSafari()) {
+    //         seamlessClip = false;
+    //     }
+    //     UI.rfb.clipboardSeamless = seamlessClip
+    //     UI.rfb.keyboard.enableIME = UI.getSetting('enable_ime', true, false);
+    //     UI.rfb.clipboardBinary = supportsBinaryClipboard() && UI.rfb.clipboardSeamless;
+    //     UI.rfb.enableWebRTC = UI.getSetting('enable_webrtc', true, false);
+    //     UI.rfb.mouseButtonMapper = UI.initMouseButtonMapper();
+    //     if (UI.rfb.videoQuality === 5) {
+    //         UI.rfb.enableQOI = true;
+    //     }
+
+    //     if (UI.supportsBroadcastChannel) {
+    //         UI.controlChannel = new BroadcastChannel(UI.rfb.connectionID);
+    //         UI.controlChannel.addEventListener('message', UI.handleControlMessage)
+    //     }
+
+    //     //attach this secondary display to the primary display
+    //     const screen = UI.rfb.attachSecondaryDisplay(details);
+    //     UI.screenID = screen.screenID
+    //     UI.screen = screen
+    //     document.querySelector('title').textContent = 'Display ' + UI.screenID
+    //     window.name = UI.screenID
+
+    //     if (supportsBinaryClipboard()) {
+    //         // explicitly request permission to the clipboard
+    //         navigator.permissions.query({ name: "clipboard-read" })
+    //             .then((result) => { Log.Debug('binary clipboard enabled') })
+    //             .catch(() => {});
+    //     }
+    // },
+    connect(event, password) {
+
+        // Ignore when rfb already exists
+        if (typeof UI.rfb !== 'undefined') {
+            return;
+        }
+
+        const host = UI.getSetting('host');
+        const port = UI.getSetting('port');
+        const path = UI.getSetting('path');
+
+        if (typeof password === 'undefined') {
+            password = UI.getSetting('password');
+            UI.reconnectPassword = password;
+        }
+
+        if (password === null) {
+            password = undefined;
+        }
+
+        UI.hideStatus();
+
+        UI.closeConnectPanel();
+
+        UI.updateVisualState('connecting');
+
+        let url;
+
+        if (host) {
+            url = new URL("https://" + host);
+
+            url.protocol = UI.getSetting('encrypt') ? 'wss:' : 'ws:';
+            if (port) {
+                url.port = port;
+            }
+
+            // "./" is needed to force URL() to interpret the path-variable as
+            // a path and not as an URL. This is relevant if for example path
+            // starts with more than one "/", in which case it would be
+            // interpreted as a host name instead.
+            url = new URL("./" + path, url);
+        } else {
+            // Current (May 2024) browsers support relative WebSocket
+            // URLs natively, but we need to support older browsers for
+            // some time.
+            url = new URL(path, location.href);
+            url.protocol = (window.location.protocol === "https:") ? 'wss:' : 'ws:';
+        }
+
+        try {
+            UI.rfb = new RFB(document.getElementById('noVNC_container'),
+                             url.href,
+                             { shared: UI.getSetting('shared'),
+                               repeaterID: UI.getSetting('repeaterID'),
+                               credentials: { password: password } });
+        } catch (exc) {
+            Log.Error("Failed to connect to server: " + exc);
+            UI.updateVisualState('disconnected');
+            UI.showStatus(_("Failed to connect to server: ") + exc, 'error');
+            return;
+        }
 
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
-        //TODO: add support for forced static resolution for multiple monitors
-        //UI.rfb.forcedResolutionX = UI.getSetting('forced_resolution_x', false);
-        //UI.rfb.forcedResolutionY = UI.getSetting('forced_resolution_y', false);
-        const resize_setting = UI.getSetting('resize', false, 'remote');
-        UI.rfb.clipViewport = resize_setting !== 'off';
-        UI.rfb.scaleViewport = resize_setting === 'scale';
-        UI.rfb.resizeSession = resize_setting === 'remote';
+        UI.rfb.addEventListener("serververification", UI.serverVerify);
+        UI.rfb.addEventListener("credentialsrequired", UI.credentials);
+        UI.rfb.addEventListener("securityfailure", UI.securityFailed);
+        UI.rfb.addEventListener("clippingviewport", UI.updateViewDrag);
+        UI.rfb.addEventListener("capabilities", UI.updatePowerButton);
+        UI.rfb.addEventListener("clipboard", UI.clipboardReceive);
+        UI.rfb.addEventListener("bell", UI.bell);
+        UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
+        UI.rfb.clipViewport = UI.getSetting('view_clip');
+        UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
+        UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
         UI.rfb.qualityLevel = parseInt(UI.getSetting('quality'));
-        UI.rfb.dynamicQualityMin = parseInt(UI.getSetting('dynamic_quality_min'));
-        UI.rfb.dynamicQualityMax = parseInt(UI.getSetting('dynamic_quality_max'));
-        UI.rfb.jpegVideoQuality = parseInt(UI.getSetting('jpeg_video_quality'));
-        UI.rfb.webpVideoQuality = parseInt(UI.getSetting('webp_video_quality'));
-        UI.rfb.videoArea = parseInt(UI.getSetting('video_area'));
-        UI.rfb.videoTime = parseInt(UI.getSetting('video_time'));
-        UI.rfb.videoOutTime = parseInt(UI.getSetting('video_out_time'));
-        UI.rfb.videoScaling = parseInt(UI.getSetting('video_scaling'));
-        UI.rfb.treatLossless = parseInt(UI.getSetting('treat_lossless'));
-        UI.rfb.maxVideoResolutionX = parseInt(UI.getSetting('max_video_resolution_x'));
-        UI.rfb.maxVideoResolutionY = parseInt(UI.getSetting('max_video_resolution_y'));
-        UI.rfb.frameRate = parseInt(UI.getSetting('framerate'));
         UI.rfb.compressionLevel = parseInt(UI.getSetting('compression'));
-        UI.rfb.showDotCursor = UI.getSetting('show_dot', true);
-        UI.rfb.idleDisconnect = UI.getSetting('idle_disconnect');
-        UI.rfb.pointerRelative = UI.getSetting('pointer_relative');
-        UI.rfb.videoQuality = parseInt(UI.getSetting('video_quality'));
-        UI.rfb.antiAliasing = UI.getSetting('anti_aliasing');
-        UI.rfb.clipboardUp = UI.getSetting('clipboard_up', true, true);
-        UI.rfb.clipboardDown = UI.getSetting('clipboard_down', true, true);
-        let seamlessClip = UI.getSetting('clipboard_seamless', true, true);
-        if (isFirefox() || isSafari()) {
-            seamlessClip = false;
-        }
-        UI.rfb.clipboardSeamless = seamlessClip
-        UI.rfb.keyboard.enableIME = UI.getSetting('enable_ime', true, false);
-        UI.rfb.clipboardBinary = supportsBinaryClipboard() && UI.rfb.clipboardSeamless;
-        UI.rfb.enableWebRTC = UI.getSetting('enable_webrtc', true, false);
-        UI.rfb.mouseButtonMapper = UI.initMouseButtonMapper();
-        if (UI.rfb.videoQuality === 5) {
-            UI.rfb.enableQOI = true;
-        }
+        UI.rfb.showDotCursor = UI.getSetting('show_dot');
 
-        if (UI.supportsBroadcastChannel) {
-            UI.controlChannel = new BroadcastChannel(UI.rfb.connectionID);
-            UI.controlChannel.addEventListener('message', UI.handleControlMessage)
-        }
-
-        //attach this secondary display to the primary display
-        const screen = UI.rfb.attachSecondaryDisplay(details);
-        UI.screenID = screen.screenID
-        UI.screen = screen
-        document.querySelector('title').textContent = 'Display ' + UI.screenID
-        window.name = UI.screenID
-
-        if (supportsBinaryClipboard()) {
-            // explicitly request permission to the clipboard
-            navigator.permissions.query({ name: "clipboard-read" })
-                .then((result) => { Log.Debug('binary clipboard enabled') })
-                .catch(() => {});
-        }
+        UI.updateViewOnly(); // requires UI.rfb
     },
 
     disconnect() {
